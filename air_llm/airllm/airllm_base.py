@@ -15,7 +15,10 @@ from transformers.quantizers import AutoHfQuantizer, HfQuantizer
 
 from .profiler import LayeredProfiler
 
-from optimum.bettertransformer import BetterTransformer
+try:
+    from optimum.bettertransformer import BetterTransformer
+except Exception:
+    BetterTransformer = None
 
 from .utils import clean_memory, load_layer, \
     find_or_create_local_splitted_path
@@ -184,7 +187,7 @@ class AirLLMBaseModel(GenerationMixin):
         # Load meta model (no memory used)
         self.model = None
 
-        if self.get_use_better_transformer():
+        if self.get_use_better_transformer() and BetterTransformer is not None:
             try:
                 with init_empty_weights():
                     self.model = AutoModelForCausalLM.from_config(self.config, trust_remote_code=True)
@@ -209,6 +212,8 @@ class AirLLMBaseModel(GenerationMixin):
                     del self.model
                     clean_memory()
                     self.model = None
+        elif self.get_use_better_transformer() and BetterTransformer is None:
+            print("optimum.bettertransformer is unavailable; falling back to standard model initialization")
 
         # fallback to original way
         if self.model is None:
