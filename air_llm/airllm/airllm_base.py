@@ -319,9 +319,20 @@ class AirLLMBaseModel(GenerationMixin):
             if (self.hf_quantizer is None or
                 not self.hf_quantizer.check_quantized_param(self.model, param_value=None, param_name=param_name, state_dict={})
                ):
-                set_module_tensor_to_device(self.model, param_name, self.running_device, value=state_dict[param_name],
-                                            dtype=self.running_dtype,
-                                            )
+                try:
+                    set_module_tensor_to_device(
+                        self.model,
+                        param_name,
+                        self.running_device,
+                        value=state_dict[param_name],
+                        dtype=self.running_dtype,
+                    )
+                except AttributeError:
+                    # Newer transformers Llama attention variants may not expose rotary_emb on attention modules.
+                    # The checkpoint can still include those tensors, so we skip them if the target path is absent.
+                    if 'rotary_emb' in param_name:
+                        continue
+                    raise
             else:
                 torch_dtype = self.hf_quantizer.update_torch_dtype(None)
                 self.hf_quantizer.create_quantized_param(self.model, state_dict[param_name], param_name, self.running_device, state_dict)
@@ -390,6 +401,21 @@ class AirLLMBaseModel(GenerationMixin):
     def get_position_ids_args(self, full_position_ids, len_p, len_s):
 
         return {'position_ids': full_position_ids[:, len_p:len_p + len_s]}
+
+    def get_runtime_pos_emb_args(self, seq, position_ids_args):
+        position_ids = position_ids_args.get('position_ids')
+        if position_ids is None:
+            return {}
+
+        model_base = getattr(self.model, 'model', None)
+        rotary_emb = getattr(model_base, 'rotary_emb', None)
+        if rotary_emb is None:
+            return {}
+
+        try:
+            return {'position_embeddings': rotary_emb(seq, position_ids)}
+        except Exception:
+            return {}
 
 
     def run_lm_head(self, layer, seq):
@@ -533,8 +559,9 @@ class AirLLMBaseModel(GenerationMixin):
                                       }
 
                             pos_embed_args = self.get_pos_emb_args(len_p, len_s)
+                            runtime_pos_embed_args = self.get_runtime_pos_emb_args(seq, position_ids_args)
                             kwargs = {**kwargs, **past_key_value_args, **pos_embed_args, **attention_mask_args,
-                                      **position_ids_args}
+                                      **position_ids_args, **runtime_pos_embed_args}
 
 
                             layer_outputs = layer(seq,
@@ -556,9 +583,10 @@ class AirLLMBaseModel(GenerationMixin):
 
 
 
-                            pos_embed_args = self.get_pos_emb_args(0, len_seq)
                             attention_mask_args = self.get_attention_mask_args(attention_mask, 0, len_seq)
                             position_ids_args = self.get_position_ids_args(position_ids, 0, len_seq)
+                            pos_embed_args = self.get_pos_emb_args(0, len_seq)
+                            runtime_pos_embed_args = self.get_runtime_pos_emb_args(seq, position_ids_args)
 
 
 
@@ -568,7 +596,8 @@ class AirLLMBaseModel(GenerationMixin):
                                 kwargs = {'use_cache': False,
                                           'attention_mask': attention_mask[:, :, -len_seq:, -len_seq:],
                                           }
-                                kwargs = {**kwargs, **pos_embed_args, **attention_mask_args, **position_ids_args}
+                                kwargs = {**kwargs, **pos_embed_args, **attention_mask_args, **position_ids_args,
+                                          **runtime_pos_embed_args}
 
 
                                 new_seq = layer(seq, **kwargs)[0]
@@ -577,7 +606,8 @@ class AirLLMBaseModel(GenerationMixin):
                                 kwargs = {'use_cache': True,
                                           'attention_mask': attention_mask[:, :, -len_seq:, -len_seq:],
                                           }
-                                kwargs = {**kwargs, **pos_embed_args, **attention_mask_args, **position_ids_args}
+                                kwargs = {**kwargs, **pos_embed_args, **attention_mask_args, **position_ids_args,
+                                          **runtime_pos_embed_args}
 
                                 layer_out = layer(seq, **kwargs)
 
