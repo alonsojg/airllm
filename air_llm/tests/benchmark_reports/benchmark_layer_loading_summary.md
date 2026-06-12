@@ -1,8 +1,8 @@
-# AirLLM Layer Loading Benchmark Summary
+# AtmoLLM Layer Loading Benchmark Summary
 
 ## Scope
 
-This benchmark compares baseline AirLLM single-layer loading (`max_layers_in_memory=1`) against multi-layer loading (`2`, `4`, `8`) using:
+This benchmark compares baseline AtmoLLM single-layer loading (`max_layers_in_memory=1`) against multi-layer loading (`2`, `4`, `8`) using:
 
 - Model: `garage-bAInd/Platypus2-7B`
 - Compression: `4bit`
@@ -40,8 +40,7 @@ This dataset does **not** support a cubic or square-root scaling claim. A more a
 - `1 -> 4` layers: `0.3210 -> 0.5500 tok/s`, about **+71.3%**
 - `1 -> 8` layers: `0.3210 -> 0.6273 tok/s`, about **+95.4%**
 
-This pattern is the clearest signal in the benchmark: boost in performance grows at
-an almost cube-root pace of n (where n is the number of layers simultaneously loaded.)
+This pattern is the clearest signal in the benchmark: performance improves with more resident layers, but the curve is still clearly sublinear rather than linear or cubic.
 
 ## Memory Observations
 
@@ -78,8 +77,8 @@ The strongest concise conclusion is:
 
 A defensible interpretation for a report is:
 
-> AirLLM benefits materially from loading multiple layers at once, but the scaling is sublinear rather than proportional to the number of resident layers.
+> AtmoLLM benefits materially from loading multiple layers at once, but the scaling is sublinear rather than proportional to the number of resident layers.
 
 ## Suggested Report Language
 
-AirLLM was benchmarked on `garage-bAInd/Platypus2-7B` with 4-bit compression on a CUDA GPU while varying `max_layers_in_memory` across `1`, `2`, `4`, and `8`. Relative to baseline single-layer loading, throughput improved monotonically from `0.321 tok/s` to `0.627 tok/s`, yielding an overall `1.95x` speedup at `8` layers. The speedup curve was sublinear, with diminishing returns at higher residency levels, indicating that keeping more layers resident reduces load overhead but does not scale proportionally with the number of retained layers. Peak VRAM usage rose from roughly `0.84 GB` at `1` layer to `3.09 GB` at `8` layers, showing the expected performance-memory tradeoff.
+AtmoLLM was benchmarked on `garage-bAInd/Platypus2-7B` with 4-bit compression on a CUDA GPU while varying `max_layers_in_memory` across `1`, `2`, `4`, and `8`. Relative to baseline single-layer loading, throughput improved monotonically from `0.321 tok/s` to `0.627 tok/s`, yielding an overall `1.95x` speedup at `8` layers. The speedup curve was sublinear, with diminishing returns at higher residency levels, indicating that keeping more layers resident reduces load overhead but does not scale proportionally with the number of retained layers. Peak VRAM usage rose from roughly `0.84 GB` at `1` layer to `3.09 GB` at `8` layers, showing the expected performance-memory tradeoff.

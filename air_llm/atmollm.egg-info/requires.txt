@@ -1,0 +1,8 @@
+tqdm
+torch
+transformers
+accelerate
+safetensors
+optimum
+huggingface-hub
+scipy

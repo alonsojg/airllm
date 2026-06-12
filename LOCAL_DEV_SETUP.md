@@ -1,4 +1,4 @@
-# AirLLM Local Dev Setup
+# AtmoLLM Local Dev Setup
 
 This setup is tested in this workspace on Linux.
 
@@ -12,8 +12,8 @@ scripts/dev_smoke_test.sh
 What this does:
 
 - Creates `.venv` if missing.
-- Installs editable AirLLM and dev dependencies.
-- Applies compatibility pins required by current AirLLM imports.
+- Installs editable AtmoLLM and dev dependencies.
+- Applies compatibility pins required by current AirLLM-compatible imports.
 - Runs import + unit-test smoke checks.
 
 ## 1) Create and use venv
@@ -24,7 +24,7 @@ source .venv/bin/activate
 python -m pip install --upgrade pip setuptools wheel
 ```
 
-## 2) Install AirLLM editable package
+## 2) Install AtmoLLM editable package
 
 ```bash
 python -m pip install -e ./air_llm
@@ -36,9 +36,9 @@ python -m pip install -e ./air_llm
 python -m pip install evaluate scikit-learn sentencepiece wandb peft pytest
 ```
 
-## 4) Pin compatibility for AirLLM import path
+## 4) Pin compatibility for the import path
 
-AirLLM imports `optimum.bettertransformer`, which requires `transformers<4.49`.
+AtmoLLM keeps compatibility with the original AirLLM import path. The current code also uses `optimum.bettertransformer`, which requires `transformers<4.49`.
 
 ```bash
 python -m pip install "optimum<2" "transformers<4.49"
@@ -47,7 +47,7 @@ python -m pip install "optimum<2" "transformers<4.49"
 ## 5) Smoke test
 
 ```bash
-python -c "import airllm; from airllm import AutoModel; import torch; print('ok', torch.__version__)"
+python -c "import atmollm; from atmollm import AutoModel; import torch; print('ok', torch.__version__)"
 ```
 
 ## 6) Lightweight unit test
