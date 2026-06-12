@@ -37,10 +37,11 @@ This dataset does **not** support a cubic or square-root scaling claim. A more a
 ## Incremental Gain Per Step
 
 - `1 -> 2` layers: `0.3210 -> 0.4322 tok/s`, about **+34.6%**
-- `2 -> 4` layers: `0.4322 -> 0.5500 tok/s`, about **+27.3%**
-- `4 -> 8` layers: `0.5500 -> 0.6273 tok/s`, about **+14.1%**
+- `1 -> 4` layers: `0.3210 -> 0.5500 tok/s`, about **+71.3%**
+- `1 -> 8` layers: `0.3210 -> 0.6273 tok/s`, about **+95.4%**
 
-This pattern is the clearest signal in the benchmark: the first increase in residency helps most, later increases still help, but less strongly.
+This pattern is the clearest signal in the benchmark: boost in performance grows at
+an almost cube-root pace of n (where n is the number of layers simultaneously loaded.)
 
 ## Memory Observations
 
