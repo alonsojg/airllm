@@ -2,7 +2,7 @@ import importlib
 from transformers import AutoConfig
 from sys import platform
 
-MODULE_NAME = (__package__ or "airllm").split(".")[0]
+MODULE_NAME = (__package__ or "atmollm").split(".")[0]
 
 is_on_mac_os = False
 

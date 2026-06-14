@@ -14,7 +14,7 @@ import psutil
 import torch
 from accelerate.utils.modeling import set_module_tensor_to_device
 
-from airllm import AutoModel
+from atmollm import AutoModel
 
 
 def parse_args():

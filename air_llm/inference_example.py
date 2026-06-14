@@ -1,4 +1,4 @@
-from airllm import AirLLMLlama2
+from atmollm import AirLLMLlama2
 
 MAX_LENGTH = 128
 # could use hugging face model repo id:

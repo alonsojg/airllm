@@ -57,10 +57,10 @@
 
 ### 1. Install package
 
-First, install the airllm pip package.
+First, install the atmollm pip package.
 
 ```bash
-pip install airllm
+pip install atmollm
 ```
 
 ### 2. Inference
@@ -70,7 +70,7 @@ Then, initialize AirLLMLlama2, pass in the huggingface repo ID of the model bein
 (*You can also specify the path to save the splitted layered model through **layer_shards_saving_path** when init AirLLMLlama2.*
 
 ```python
-from airllm import AutoModel
+from atmollm import AutoModel
 
 MAX_LENGTH = 128
 # could use hugging face model repo id:
@@ -116,7 +116,7 @@ We just added model compression based on block-wise quantization-based model com
 #### How to enable model compression speed up:
 
 * Step 1. make sure you have [bitsandbytes](https://github.com/TimDettmers/bitsandbytes) installed by `pip install -U bitsandbytes `
-* Step 2. make sure airllm verion later than 2.0.0: `pip install -U airllm` 
+* Step 2. make sure atmollm verion later than 2.0.0: `pip install -U atmollm` 
 * Step 3. when initialize the model, passing the argument compression ('4bit' or '8bit'):
 
 ```python
@@ -144,7 +144,7 @@ When initialize the model, we support the following configurations:
 
 ## MacOS
 
-Just install airllm and run the code the same as on linux. See more in [Quick Start](#quickstart).
+Just install atmollm and run the code the same as on linux. See more in [Quick Start](#quickstart).
 
 * make sure you installed [mlx](https://github.com/ml-explore/mlx?tab=readme-ov-file#installation) and torch
 * you probabaly need to install python native see more [here](https://stackoverflow.com/a/65432861/21230266)
@@ -169,7 +169,7 @@ Example colabs here:
 * ChatGLM:
 
 ```python
-from airllm import AutoModel
+from atmollm import AutoModel
 MAX_LENGTH = 128
 model = AutoModel.from_pretrained("THUDM/chatglm3-6b-base")
 input_text = ['What is the capital of China?',]
@@ -190,7 +190,7 @@ model.tokenizer.decode(generation_output.sequences[0])
 * QWen:
 
 ```python
-from airllm import AutoModel
+from atmollm import AutoModel
 MAX_LENGTH = 128
 model = AutoModel.from_pretrained("Qwen/Qwen-7B")
 input_text = ['What is the capital of China?',]
@@ -211,7 +211,7 @@ model.tokenizer.decode(generation_output.sequences[0])
 * Baichuan, InternLM, Mistral, etc:
 
 ```python
-from airllm import AutoModel
+from atmollm import AutoModel
 MAX_LENGTH = 128
 model = AutoModel.from_pretrained("baichuan-inc/Baichuan2-7B-Base")
 #model = AutoModel.from_pretrained("internlm/internlm-20b")
@@ -262,14 +262,14 @@ Most likely you are loading QWen or ChatGLM model with Llama2 class. Try the fol
 For QWen model: 
 
 ```python
-from airllm import AutoModel #<----- instead of AirLLMLlama2
+from atmollm import AutoModel #<----- instead of AirLLMLlama2
 AutoModel.from_pretrained(...)
 ```
 
 For ChatGLM model: 
 
 ```python
-from airllm import AutoModel #<----- instead of AirLLMLlama2
+from atmollm import AutoModel #<----- instead of AirLLMLlama2
 AutoModel.from_pretrained(...)
 ```
 
